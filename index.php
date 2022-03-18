@@ -17,11 +17,18 @@ $fileId = '1PIBUACgCcMl6mCNXpSwnKNaoWCE6t4Oj';
 
 $service = new Google\Service\Drive($client);
 
+$folderId = '1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV';
 
 
 
 
-function downloadFile($service, $fileId, $path){
+foreach($list as $element){
+  echo "$element->id<br>";
+  echo "$element->mimeType<br>";
+  echo "$element->name<br>";
+}
+
+function downloadOneFile($service, $fileId, $path){
   $response = $service->files->get($fileId, array('alt' => 'media'));
   $content = $response->getBody()->getContents();
 
@@ -31,3 +38,17 @@ function downloadFile($service, $fileId, $path){
   fclose($file);
 }
 
+function listFilesFromFolder($service, $folderId){
+  $parameters = array(
+    'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
+    'q' => "'".$folderId."' in parents"
+  );
+  
+  $list = $service->files->listFiles($parameters);
+  
+  return $list;
+}
+
+function downloadAllFiles($service, $idList){
+  
+}
