@@ -2,10 +2,12 @@
 
 require __DIR__ . '/api-google/vendor/autoload.php';
 date_default_timezone_set('America/Asuncion');
+header('Content-type: text/plain');
 
 //AUTENTICACION por Cuenta de Servicio
 $pathCredentials = __DIR__ . '/download-from-drive-344514-ac9963e071a3.json';
-$downloadPath = __DIR__ . "/downloads";
+$downloadPath = dirname(__DIR__).'/Documentos';
+$csvPath = __DIR__.'/links.csv';
 
 putenv("GOOGLE_APPLICATION_CREDENTIALS=$pathCredentials");
 
@@ -15,10 +17,7 @@ $client->addScope("https://www.googleapis.com/auth/drive");
 
 $service = new Google\Service\Drive($client);
 
-$dowloadPath = __DIR__.'/downloads';
-$csvPath = __DIR__.'/links.csv';
-
-// displayEchoWhileExecuting();
+displayEchoWhileExecuting();
 
 $links = getLinksFromCsv($csvPath);
 
@@ -34,21 +33,22 @@ foreach($links as $link){
     $name = $result['name'];
     $fileExtension = $result['fileExtension'];
     downloadOneFile($service, $fileId, $downloadPath, $fileExtension, time());
-    writeOnFolderNames($name, $fileId);
+    // writeOnFolderNames($name, $fileId);
     
   }else{
     $folderId = getFolderId($link);
     $list = listFilesFromFolder($service, $folderId);
     $folderName = '';
-    
-    if(count($list)>0){
-      $folderName = getFolderName($service, $folderId);
-      writeOnFolderNames($folderName, $folderId);  
+    // echo isset($list);
+    // echo "count($list)<br>";
+    if(isset($list)){
+      // $folderName = getFolderName($service, $folderId);
+      // writeOnFolderNames($folderName, $folderId);  
+      echo "\nLink: $link: $folderName\n";
+      downloadListOfFiles($service, $list, $downloadPath, $folderId); 
     }
     
-    echo "\nLink: $link: $folderName\n";
-    downloadListOfFiles($service, $list, $downloadPath, $folderId); 
-  }  
+  }
   
 }
 
@@ -57,14 +57,20 @@ function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
     return;
   }
   
-  $response = $service->files->get($fileId, array('alt' => 'media'));
-  $content = $response->getBody()->getContents();
+  try{
+    $response = $service->files->get($fileId, array('alt' => 'media'));
+    $content = $response->getBody()->getContents();
+    
+    $file = fopen("$path/$name.$fileExtension", "w+");
   
-  $file = fopen("$path/$name.$fileExtension", "w+");
-
-  fwrite($file, $content);
-  fclose($file);
-  echo "$fileId \n";
+    fwrite($file, $content);
+    fclose($file);
+    echo "$fileId \n";
+  }catch(Exception $e){
+    echo 'Ocurrió un error';
+    logError($e);
+  }
+  
 }
 
 function listFilesFromFolder($service, $folderId){
@@ -73,9 +79,14 @@ function listFilesFromFolder($service, $folderId){
     'q' => "'".$folderId."' in parents"
   );
   
-  $list = $service->files->listFiles($parameters);
+  try{
+    $list = $service->files->listFiles($parameters);
+    return $list;
+  }catch(Exception $e){
+    echo 'Ocurrió un error';
+    logError($e);
+  }
   
-  return $list;
 }
 
 function downloadListOfFiles($service, $list, $downloadPath, $folderId){
@@ -144,4 +155,10 @@ function imageType($fileExtension){
     return false;
   }
   
+}
+
+function logError($e){
+  $file = __DIR__.'/log.log';
+  $e = "///////////////////////////////////////////\n$e\n///////////////////////////////////////////";
+  file_put_contents($file, $e, FILE_APPEND);
 }
