@@ -21,26 +21,28 @@ $csvPath = __DIR__.'/links.csv';
 //test
 // $folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
 // $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
-// $id = '1PIBUACgCcMl6mCNXpSwnKNaoWCE6t4Oj';
-$id = '1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV';
 
-// displayEchoWhileExecuting();
+displayEchoWhileExecuting();
 
-// $links = getLinksFromCsv($csvPath);
+$links = getLinksFromCsv($csvPath);
 
-// foreach($links as $link){
+if ($links === null){
+  die("Error al leer csv");
+}
+
+foreach($links as $link){
+  $folderId = getFolderId($link);
+  $list = listFilesFromFolder($service, $folderId);
+  $folderName = '';
   
-//   echo "<br>Link: $link<br>";
+  if(count($list)>0){
+    $folderName = getFolderName($service, $folderId);
+    writeOnFolderNames($folderName, $folderId);  
+  }
   
-//   $folderId = getFolderId($link);
-
-//   $list = listFilesFromFolder($service, $folderId);
-
-//   downloadListOfFiles($service, $list, $downloadPath, $folderId);
-  
-// }
-
-
+  echo "<br>Link: $link: $folderName<br>";
+  downloadListOfFiles($service, $list, $downloadPath, $folderId);
+}
 
 
 
@@ -106,8 +108,13 @@ function getLinksFromCsv($csvPath){
     
 }
 
-function getFolderName($service, $id){
-  $result = $service->files->get($id);
+function getFolderName($service, $folderId){
+  $result = $service->files->get($folderId);
   $name = $result->getName();
   return $name;
+}
+
+function writeOnFolderNames($folderName, $folderId){
+  $file = __DIR__.'/FolderNames.txt';
+  file_put_contents($file, "$folderName ; $folderId\n", FILE_APPEND);
 }
