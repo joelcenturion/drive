@@ -22,6 +22,16 @@ $csvPath = __DIR__.'/links.csv';
 // $folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
 // $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
 
+// $fileId = '1qck88s3EJRkjl6W-7ezMe_pC-VyLj0iy';
+// $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
+// $name = $result['name'];
+// $fileExtension = $result['fileExtension'];
+// echo  $fileExtension;
+// $name = str_replace(".$fileExtension", '', $name);
+// echo $name;
+
+// die('fin');
+
 displayEchoWhileExecuting();
 
 $links = getLinksFromCsv($csvPath);
@@ -31,20 +41,30 @@ if ($links === null){
 }
 
 foreach($links as $link){
-  $folderId = getFolderId($link);
-  $list = listFilesFromFolder($service, $folderId);
-  $folderName = '';
+  if(!strpos($link, 'folders/')){
+    echo "<br>Link: $link<br>";
+    $fileId = getFileId($link);
+    $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
+    $name = $result['name'];
+    $fileExtension = $result['fileExtension'];
+    downloadOneFile($service, $fileId, $downloadPath, $fileExtension, time());
+    writeOnFolderNames($name, $fileId);
+    
+  }else{
+    $folderId = getFolderId($link);
+    $list = listFilesFromFolder($service, $folderId);
+    $folderName = '';
+    
+    if(count($list)>0){
+      $folderName = getFolderName($service, $folderId);
+      writeOnFolderNames($folderName, $folderId);  
+    }
+    
+    echo "<br>Link: $link: $folderName<br>";
+    downloadListOfFiles($service, $list, $downloadPath, $folderId); 
+  }  
   
-  if(count($list)>0){
-    $folderName = getFolderName($service, $folderId);
-    writeOnFolderNames($folderName, $folderId);  
-  }
-  
-  echo "<br>Link: $link: $folderName<br>";
-  downloadListOfFiles($service, $list, $downloadPath, $folderId);
 }
-
-
 
 function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
   $response = $service->files->get($fileId, array('alt' => 'media'));
@@ -54,6 +74,7 @@ function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
 
   fwrite($file, $content);
   fclose($file);
+  echo "$fileId <br>";
 }
 
 function listFilesFromFolder($service, $folderId){
@@ -81,8 +102,6 @@ function downloadListOfFiles($service, $list, $downloadPath, $folderId){
   
   for($i = 0; $i < $length; $i++){
     downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
-    echo "{$list[$i]['id']} <br>";
-
   }
   
 }
@@ -117,4 +136,11 @@ function getFolderName($service, $folderId){
 function writeOnFolderNames($folderName, $folderId){
   $file = __DIR__.'/FolderNames.txt';
   file_put_contents($file, "$folderName ; $folderId\n", FILE_APPEND);
+}
+
+function getFileId($fileLink){
+  $needle = 'file/d/';
+  $fileId = substr($fileLink, stripos($fileLink, $needle) + strlen($needle));
+  $fileId =  substr($fileId, 0, stripos($fileId, '/view'));
+  return $fileId;
 }
