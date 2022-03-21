@@ -18,21 +18,7 @@ $service = new Google\Service\Drive($client);
 $dowloadPath = __DIR__.'/downloads';
 $csvPath = __DIR__.'/links.csv';
 
-//test
-// $folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
-// $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
-
-// $fileId = '1qck88s3EJRkjl6W-7ezMe_pC-VyLj0iy';
-// $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
-// $name = $result['name'];
-// $fileExtension = $result['fileExtension'];
-// echo  $fileExtension;
-// $name = str_replace(".$fileExtension", '', $name);
-// echo $name;
-
-// die('fin');
-
-displayEchoWhileExecuting();
+// displayEchoWhileExecuting();
 
 $links = getLinksFromCsv($csvPath);
 
@@ -42,7 +28,7 @@ if ($links === null){
 
 foreach($links as $link){
   if(!strpos($link, 'folders/')){
-    echo "<br>Link: $link<br>";
+    echo "\nLink: $link\n";
     $fileId = getFileId($link);
     $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
     $name = $result['name'];
@@ -60,7 +46,7 @@ foreach($links as $link){
       writeOnFolderNames($folderName, $folderId);  
     }
     
-    echo "<br>Link: $link: $folderName<br>";
+    echo "\nLink: $link: $folderName\n";
     downloadListOfFiles($service, $list, $downloadPath, $folderId); 
   }  
   
@@ -78,7 +64,7 @@ function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
 
   fwrite($file, $content);
   fclose($file);
-  echo "$fileId <br>";
+  echo "$fileId \n";
 }
 
 function listFilesFromFolder($service, $folderId){
@@ -96,7 +82,7 @@ function downloadListOfFiles($service, $list, $downloadPath, $folderId){
   
   $length = count($list);
   if($length <= 0) {
-    echo "VACIO<br>"; 
+    echo "VACIO\n"; 
     return;
   };
   
