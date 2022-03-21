@@ -13,18 +13,29 @@ $client = new Google\Client();
 $client->useApplicationDefaultCredentials();
 $client->addScope("https://www.googleapis.com/auth/drive");
 
-//para test
-$fileId = '1PIBUACgCcMl6mCNXpSwnKNaoWCE6t4Oj';
-$folderId = '1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV';
-
 $service = new Google\Service\Drive($client);
 
+$dowloadPath = __DIR__.'/downloads';
 
-function downloadOneFile($service, $fileId, $path, $fileExtension){
+//test
+$folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
+// $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
+
+
+$folderId = getFolderId($folderLink);
+
+$list = listFilesFromFolder($service, $folderId);
+
+downloadListOfFiles($service, $list, $downloadPath, $folderId);
+
+
+
+
+function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
   $response = $service->files->get($fileId, array('alt' => 'media'));
   $content = $response->getBody()->getContents();
 
-  $file = fopen($path, "w+");
+  $file = fopen("$path/$name.$fileExtension", "w+");
 
   fwrite($file, $content);
   fclose($file);
@@ -41,6 +52,30 @@ function listFilesFromFolder($service, $folderId){
   return $list;
 }
 
-function downloadListOfFiles($service, $list){
-  echo '';
+function downloadListOfFiles($service, $list, $downloadPath, $folderId){
+  
+  $length = count($list);
+  if($length <= 0) return;
+  $name = time();
+  mkdir ("$downloadPath/$folderId");
+  $path = "$downloadPath/$folderId";
+  
+  for($i = 0; $i < $length; $i++){
+    downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
+    echo "{$list[$i]['id']} <br>";
+
+  }
+  
+}
+
+function getFolderId($folderLink){
+  $needle = 'folders/';
+  $folderId = substr($folderLink, stripos($folderLink, $needle) + strlen($needle));
+  $folderId =  substr($folderId, 0, stripos($folderId, '?'));
+  return $folderId;
+}
+
+function displayEchoWhileExecuting(){
+  ob_implicit_flush(true);
+  ob_end_flush();
 }
