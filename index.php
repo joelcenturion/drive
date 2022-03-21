@@ -2,7 +2,6 @@
 
 require __DIR__ . '/api-google/vendor/autoload.php';
 date_default_timezone_set('America/Asuncion');
-header('Content-type: text/plain');
 
 //AUTENTICACION por Cuenta de Servicio
 $pathCredentials = __DIR__ . '/download-from-drive-344514-ac9963e071a3.json';
@@ -17,7 +16,7 @@ $client->addScope("https://www.googleapis.com/auth/drive");
 
 $service = new Google\Service\Drive($client);
 
-displayEchoWhileExecuting();
+// displayEchoWhileExecuting();
 
 $links = getLinksFromCsv($csvPath);
 
@@ -67,8 +66,10 @@ function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
     fclose($file);
     echo "$fileId \n";
   }catch(Exception $e){
-    echo 'Ocurrió un error';
-    logError($e);
+    $msg = "Ocurrió un error: $fileId\n"; 
+    echo $msg;
+    $e = $msg.$e;
+    logError($fileId.'\n'.$e);
   }
   
 }
@@ -83,7 +84,9 @@ function listFilesFromFolder($service, $folderId){
     $list = $service->files->listFiles($parameters);
     return $list;
   }catch(Exception $e){
-    echo 'Ocurrió un error';
+    $msg = "Ocurrió un error: $folderId\n"; 
+    echo $msg;
+    $e = $msg.$e;
     logError($e);
   }
   
