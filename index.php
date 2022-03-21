@@ -21,24 +21,24 @@ $csvPath = __DIR__.'/links.csv';
 //test
 // $folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
 // $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
+// $id = '1PIBUACgCcMl6mCNXpSwnKNaoWCE6t4Oj';
+$id = '1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV';
 
-displayEchoWhileExecuting();
+// displayEchoWhileExecuting();
 
-$links = getLinksFromCsv($csvPath);
+// $links = getLinksFromCsv($csvPath);
 
-foreach($links as $link){
+// foreach($links as $link){
   
-  echo "<br>Link: $link<br>";
+//   echo "<br>Link: $link<br>";
   
-  $folderId = getFolderId($link);
+//   $folderId = getFolderId($link);
 
-  $list = listFilesFromFolder($service, $folderId);
+//   $list = listFilesFromFolder($service, $folderId);
 
-  downloadListOfFiles($service, $list, $downloadPath, $folderId);
+//   downloadListOfFiles($service, $list, $downloadPath, $folderId);
   
-}
-
-
+// }
 
 
 
@@ -68,7 +68,11 @@ function listFilesFromFolder($service, $folderId){
 function downloadListOfFiles($service, $list, $downloadPath, $folderId){
   
   $length = count($list);
-  if($length <= 0) return;
+  if($length <= 0) {
+    echo "VACIO<br>"; 
+    return;
+  };
+  
   $name = time();
   mkdir ("$downloadPath/$folderId");
   $path = "$downloadPath/$folderId";
@@ -100,4 +104,10 @@ function getLinksFromCsv($csvPath){
   fclose($csv);
   return $links;
     
+}
+
+function getFolderName($service, $id){
+  $result = $service->files->get($id);
+  $name = $result->getName();
+  return $name;
 }
