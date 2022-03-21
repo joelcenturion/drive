@@ -16,17 +16,30 @@ $client->addScope("https://www.googleapis.com/auth/drive");
 $service = new Google\Service\Drive($client);
 
 $dowloadPath = __DIR__.'/downloads';
+$csvPath = __DIR__.'/links.csv';
 
 //test
-$folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
+// $folderLink = 'https://drive.google.com/drive/folders/1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV?usp=sharing';
 // $folderLink = 'https://drive.google.com/drive/folders/1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw?usp=sharing';
 
+displayEchoWhileExecuting();
 
-$folderId = getFolderId($folderLink);
+$links = getLinksFromCsv($csvPath);
 
-$list = listFilesFromFolder($service, $folderId);
+foreach($links as $link){
+  
+  echo "<br>Link: $link<br>";
+  
+  $folderId = getFolderId($link);
 
-downloadListOfFiles($service, $list, $downloadPath, $folderId);
+  $list = listFilesFromFolder($service, $folderId);
+
+  downloadListOfFiles($service, $list, $downloadPath, $folderId);
+  
+}
+
+
+
 
 
 
@@ -78,4 +91,13 @@ function getFolderId($folderLink){
 function displayEchoWhileExecuting(){
   ob_implicit_flush(true);
   ob_end_flush();
+}
+
+function getLinksFromCsv($csvPath){
+  
+  $csv = fopen($csvPath, "r");
+  $links = fgetcsv($csv);
+  fclose($csv);
+  return $links;
+    
 }
