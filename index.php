@@ -67,9 +67,13 @@ foreach($links as $link){
 }
 
 function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
+  if(!imageType($fileExtension)){
+    return;
+  }
+  
   $response = $service->files->get($fileId, array('alt' => 'media'));
   $content = $response->getBody()->getContents();
-
+  
   $file = fopen("$path/$name.$fileExtension", "w+");
 
   fwrite($file, $content);
@@ -143,4 +147,15 @@ function getFileId($fileLink){
   $fileId = substr($fileLink, stripos($fileLink, $needle) + strlen($needle));
   $fileId =  substr($fileId, 0, stripos($fileId, '/view'));
   return $fileId;
+}
+
+function imageType($fileExtension){
+  $fileExtension = strtolower($fileExtension);
+  $extensions = array('jpg','jpeg','png','heic');
+  if(in_array($fileExtension, $extensions)){
+    return true;
+  }else{
+    return false;
+  }
+  
 }
