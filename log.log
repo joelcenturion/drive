@@ -1,0 +1,59 @@
+///////////////////////////////////////////
+Ocurrió un error: a1oV-qfNcAfP5WEQCiXlzBzbdhoTHAreQw
+Google\Service\Exception: {
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "notFound",
+    "message": "File not found: .",
+    "locationType": "parameter",
+    "location": "fileId"
+   }
+  ],
+  "code": 404,
+  "message": "File not found: ."
+ }
+}
+ in C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php:128
+Stack trace:
+#0 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php(103): Google\Http\REST::decodeHttpResponse(Object(GuzzleHttp\Psr7\Response), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#1 [internal function]: Google\Http\REST::doExecute(Object(GuzzleHttp\Client), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#2 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Task\Runner.php(182): call_user_func_array(Array, Array)
+#3 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php(66): Google\Task\Runner->run()
+#4 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Client.php(918): Google\Http\REST::execute(Object(GuzzleHttp\Client), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...', Array, NULL)
+#5 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Service\Resource.php(238): Google\Client->execute(Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#6 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient-services\src\Drive\Resource\Files.php(247): Google\Service\Resource->call('list', Array, 'Google\\Service\\...')
+#7 C:\xampp\htdocs\drive\index.php(84): Google\Service\Drive\Resource\Files->listFiles(Array)
+#8 C:\xampp\htdocs\drive\index.php(39): listFilesFromFolder(Object(Google\Service\Drive), 'a1oV-qfNcAfP5WE...')
+#9 {main}
+//////////////////////////////////////////////////////////////////////////////////////
+Ocurrió un error: a1v7MA25xW1gwBp8rHIVLuGRCnFTnmH5aV
+Google\Service\Exception: {
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "notFound",
+    "message": "File not found: .",
+    "locationType": "parameter",
+    "location": "fileId"
+   }
+  ],
+  "code": 404,
+  "message": "File not found: ."
+ }
+}
+ in C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php:128
+Stack trace:
+#0 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php(103): Google\Http\REST::decodeHttpResponse(Object(GuzzleHttp\Psr7\Response), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#1 [internal function]: Google\Http\REST::doExecute(Object(GuzzleHttp\Client), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#2 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Task\Runner.php(182): call_user_func_array(Array, Array)
+#3 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Http\REST.php(66): Google\Task\Runner->run()
+#4 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Client.php(918): Google\Http\REST::execute(Object(GuzzleHttp\Client), Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...', Array, NULL)
+#5 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient\src\Service\Resource.php(238): Google\Client->execute(Object(GuzzleHttp\Psr7\Request), 'Google\\Service\\...')
+#6 C:\xampp\htdocs\drive\api-google\vendor\google\apiclient-services\src\Drive\Resource\Files.php(247): Google\Service\Resource->call('list', Array, 'Google\\Service\\...')
+#7 C:\xampp\htdocs\drive\index.php(84): Google\Service\Drive\Resource\Files->listFiles(Array)
+#8 C:\xampp\htdocs\drive\index.php(39): listFilesFromFolder(Object(Google\Service\Drive), 'a1v7MA25xW1gwBp...')
+#9 {main}
+///////////////////////////////////////////

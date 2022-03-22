@@ -101,13 +101,16 @@ function downloadListOfFiles($service, $list, $downloadPath, $folderId){
   };
   
   $name = time();
-  mkdir ("$downloadPath/$folderId");
   $path = "$downloadPath/$folderId";
-  
-  for($i = 0; $i < $length; $i++){
-    downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
+  if(!is_dir($path)){
+    mkdir ($path);
+    for($i = 0; $i < $length; $i++){
+      downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
+    }
+  }else{
+    echo "Duplicado\n";
   }
-  
+    
 }
 
 function getFolderId($folderLink){
