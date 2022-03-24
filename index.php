@@ -25,7 +25,7 @@ if ($links === null){
 }
 
 foreach($links as $link){
-  if(!strpos($link, 'folders/')){
+  if(strpos($link, 'folders/')===false){
     echo "\nLink: $link\n";
     $fileId = getFileId($link);
     $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
@@ -116,7 +116,9 @@ function downloadListOfFiles($service, $list, $downloadPath, $folderId){
 function getFolderId($folderLink){
   $needle = 'folders/';
   $folderId = substr($folderLink, stripos($folderLink, $needle) + strlen($needle));
-  $folderId =  substr($folderId, 0, stripos($folderId, '?'));
+  if(strpos($folderId,'?')!==false){
+    $folderId =  substr($folderId, 0, strpos($folderId, '?'));
+  }
   return $folderId;
 }
 
