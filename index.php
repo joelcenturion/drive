@@ -5,7 +5,7 @@ date_default_timezone_set('America/Asuncion');
 
 //AUTENTICACION por Cuenta de Servicio
 $pathCredentials = __DIR__ . '/download-from-drive-344514-ac9963e071a3.json';
-$downloadPath = dirname(__DIR__).'/Documentos';
+$downloadPath = __DIR__.'/Imagenes';
 $csvPath = __DIR__.'/links.csv';
 
 putenv("GOOGLE_APPLICATION_CREDENTIALS=$pathCredentials");
@@ -23,39 +23,38 @@ $links = getLinksFromCsv($csvPath);
 if ($links === null){
   die("Error al leer csv");
 }
+$remaining = count($links);
+echo "Total: $remaining\n";
 
 foreach($links as $link){
+  
   if(strpos($link, 'folders/')===false){
-    echo "\nLink: $link\n";
+    echo "\n$remaining- Link: $link\n";
     $fileId = getFileId($link);
     $result = $service->files->get($fileId, array('fields' => 'fileExtension, name'));
     $name = $result['name'];
     $fileExtension = $result['fileExtension'];
-    downloadOneFile($service, $fileId, $downloadPath, $fileExtension, time());
-    // writeOnFolderNames($name, $fileId);
-    
+    if(imageType($fileExtension)){
+      $path = "$downloadPath/$fileId";
+      if(!is_dir($path)){
+        mkdir ($path);
+        downloadOneFile($service, $fileId, $path, $fileExtension, time());
+      }else{
+        echo "\nDuplicado";
+      }
+    }
   }else{
+    echo "\n$remaining- Link: $link\n";
     $folderId = getFolderId($link);
     $list = listFilesFromFolder($service, $folderId);
-    $folderName = '';
-    // echo isset($list);
-    // echo "count($list)<br>";
     if(isset($list)){
-      // $folderName = getFolderName($service, $folderId);
-      // writeOnFolderNames($folderName, $folderId);  
-      echo "\nLink: $link: $folderName\n";
       downloadListOfFiles($service, $list, $downloadPath, $folderId); 
     }
-    
   }
-  
+  $remaining--;
 }
 
 function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
-  if(!imageType($fileExtension)){
-    return;
-  }
-  
   try{
     $response = $service->files->get($fileId, array('alt' => 'media'));
     $content = $response->getBody()->getContents();
@@ -66,7 +65,7 @@ function downloadOneFile($service, $fileId, $path, $fileExtension, $name){
     fclose($file);
     echo "$fileId \n";
   }catch(Exception $e){
-    $msg = "Ocurrió un error: $fileId\n"; 
+    $msg = "Ocurrió un error: '$fileId'\n"; 
     echo $msg;
     $e = $msg.$e;
     logError($fileId.'\n'.$e);
@@ -84,7 +83,7 @@ function listFilesFromFolder($service, $folderId){
     $list = $service->files->listFiles($parameters);
     return $list;
   }catch(Exception $e){
-    $msg = "Ocurrió un error: $folderId\n"; 
+    $msg = "Ocurrió un error: '$folderId'\n"; 
     echo $msg;
     $e = $msg.$e;
     logError($e);
@@ -105,7 +104,9 @@ function downloadListOfFiles($service, $list, $downloadPath, $folderId){
   if(!is_dir($path)){
     mkdir ($path);
     for($i = 0; $i < $length; $i++){
-      downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
+      if(imageType($list[$i]['fileExtension'])){
+        downloadOneFile($service, $list[$i]['id'], $path, $list[$i]['fileExtension'], $name+$i);
+      }
     }
   }else{
     echo "Duplicado\n";
@@ -167,6 +168,6 @@ function imageType($fileExtension){
 
 function logError($e){
   $file = __DIR__.'/log.log';
-  $e = "///////////////////////////////////////////\n$e\n///////////////////////////////////////////";
+  $e = "********************************************\n$e\n********************************************";
   file_put_contents($file, $e, FILE_APPEND);
 }
